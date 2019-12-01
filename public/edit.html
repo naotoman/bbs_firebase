@@ -9,11 +9,6 @@
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
     integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-  <style>
-    li {
-      list-style-type: none;
-    }
-  </style>
 
   <title>Hello, world!</title>
 </head>
@@ -21,14 +16,11 @@
 <body>
   <header class="text-center display-1">掲示板</header>
   <main>
-    <button id='sign-out-btn'>Sign Out</button>
-    <div id="firebaseui-auth-container"></div>
-    <ul id="all-posts">
-    </ul>
-    <button class="btn btn-primary fixed-bottom mx-auto" id="submit-button">投稿</button>
+      <div id='edit-div'>
+      </div>
   </main>
 
-
+  
   <script src="/__/firebase/7.5.0/firebase-app.js"></script>
   <script src="/__/firebase/7.5.0/firebase-auth.js"></script>
   <script src="/__/firebase/7.5.0/firebase-storage.js"></script>
@@ -50,7 +42,34 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
     integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
     crossorigin="anonymous"></script>
-  <script src="js/index.js"></script>
+  <script>
+const database = firebase.database()
+const ref_posts = database.ref('/posts/');
+
+  const edit_div = document.getElementById("edit-div");
+
+  let content = document.createElement('textarea');
+  content.classList.add("post-content", "border");
+  content.value = localStorage.edit_item;
+
+  let confirm_btn = document.createElement('button');
+  confirm_btn.classList.add("btn", "btn-primary");
+  confirm_btn.textContent = "確定";
+
+  edit_div.appendChild(content);
+  edit_div.appendChild(confirm_btn);
+
+  confirm_btn.addEventListener('click', () => {
+      ref_posts.orderByChild('number').equalTo(parseInt(localStorage.edit_num)).once('value', (snapshot) => {
+          key = Object.keys(snapshot.val())[0]
+          ref_post = ref_posts.child(key);
+          console.log(ref_post.toString());
+          console.log(content.value);
+          ref_post.update({content: content.value, updated_at: new Date().toLocaleString()});
+          location.href = '/index.html';
+      })
+  })
+  </script>
 </body>
 
 </html>
